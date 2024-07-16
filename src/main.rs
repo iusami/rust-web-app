@@ -5,8 +5,88 @@ use axum::{
     response::IntoResponse,
     Json};
 use serde::{Deserialize, Serialize};
-use std::env;
+use std::{
+    collections::HashMap,
+    env,
+    sync::{Arc, RwLock}
+    };
+use thiserror::Error;
 use tracing_subscriber;
+
+#[derive(Error, Debug)]
+enum RepositoryError{
+    #[error("Not Found, id is {0}")]
+    NotFound(i32),
+}
+
+pub trait TodoRepository: Clone + std::marker::Send + std::marker::Sync + 'static{
+    fn create(&self, payload: CreateTodo) -> Todo;
+    fn find(&self, id: i32) -> Option<Todo>;
+    fn all(&self) -> Vec<Todo>;
+    fn update(&self, id: i32) -> anyhow::Result<()>;
+    fn delete(&self, id: i32) -> anyhow::Result<()>;
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct Todo{
+    id: i32,
+    text: String,
+    completed: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct CreateTodo{
+    text: String
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
+pub struct UpdateTodo{
+    text: Option<String>,
+    completed: Option<bool>,
+}
+
+impl Todo{
+    pub fn new(id: i32, text: String) -> Self{
+        Self {
+            id,
+            text,
+            completed: false,
+        }
+    }
+}
+
+type TodoData = HashMap<i32, Todo>;
+
+#[derive(Debug, Clone)]
+pub struct TodoRepositoryForMemory{
+    store: Arc<RwLock<TodoData>>,
+}
+
+impl TodoRepositoryForMemory{
+    pub fn new() -> Self{
+        TodoRepositoryForMemory{
+            store: Arc::default(),
+        }
+    }
+}
+
+impl TodoRepository for TodoRepositoryForMemory{
+    fn create(&self, payload: CreateTodo) -> Todo {
+        todo!();
+    }
+    fn find(&self, id: i32) -> Option<Todo> {
+        todo!();
+    }
+    fn all(&self) -> Vec<Todo>{
+        todo!();
+    }
+    fn update(&self, id: i32) -> anyhow::Result<()> {
+        todo!();
+    }
+    fn delete(&self, id: i32) -> anyhow::Result<()> {
+        todo!();
+    }
+}
 
 #[tokio::main]
 async fn main(){
